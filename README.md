@@ -1,2 +1,2 @@
-# minesweeper
-Minesweeper based on python tkinter
+# miniapps
+Some miniapps based on Python
