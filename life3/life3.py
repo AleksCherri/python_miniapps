@@ -12,12 +12,12 @@ SCREEN_FULLSCREEN = False
 TPS = 600
 FPS = 60
 
-MIN_CELLS = 25
+MIN_CELLS = 200
 GENOME_MAX_LEN = 100
 
 CELL_MIN_ENERGY = 12
 CELL_ENERGY_CONSUMPTION = {'sprout':3,'stem':1,'leaf':1,'root':1,'seed':0}
-CELL_ENERGY_GEN = {'leaf':7, 'root':10}
+CELL_ENERGY_GEN = {'leaf':7, 'root':12}
 CELL_COLORS = {'sprout':(200,200,200), 'stem':(100,100,100), 'leaf':(100,200,100), 'root':(200,100,100), 'seed':(200,200,100)}
 CELL_MUTATE_CHANCE = 0.1
 
@@ -161,7 +161,22 @@ class Root(Cell):
         self.direction = direction
 
     def act(self):
+        x,y = self.pos
+        organic_under = game.organic_map[x][y]
+        if organic_under > 0:
+            energy_gen = CELL_ENERGY_GEN['root']
+            self.energy += energy_gen if organic_under > energy_gen else organic_under
+            game.organic_map[x][y] = max(organic_under-energy_gen, 0.0)
         self.check_for_death()
+
+        dx,dy = ((x+1,y),(x,y+1),(x-1,y),(x,y-1))[self.direction]
+        dx,dy = (dx+MAP_WIDTH)%MAP_WIDTH,(dy+MAP_HEIGHT)%MAP_HEIGHT
+        if game.map[dx][dy] is None:
+            game.remove_cell(self)
+            return None
+
+        self.energy /= 2
+        game.map[dx][dy].energy += self.energy
 
 class Stem(Cell):
     def __init__(self, pos, sprite, genome, start_energy, directions):
