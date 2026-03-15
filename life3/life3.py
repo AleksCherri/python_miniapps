@@ -67,7 +67,7 @@ class Game(arcade.View):
                     None, None, 100, 1
                     ), None)
 
-            for pos in self.cell_queue:
+            for pos in self.cell_queue[:]:
                 x,y = pos
                 self.map[x][y].act()
 
